@@ -22,25 +22,121 @@ Client::~Client() {
 
 
 void Client::initialize(unsigned int player, unsigned int board_size){
+
+    string name = "player_" + to_string(player) + ".action_board.json";
+    vector <int> v(board_size);
+    vector<vector<int>>board(board_size,v);
+    ofstream file;
+    file.open(name, ofstream::out);
+    if (file){
+        {
+            cereal::JSONOutputArchive arc(file);
+            arc(CEREAL_NVP(board));
+        }
+        file.close();
+        initialized = true;
+
+    }
+    else{
+        cout << "File could not be found."<<endl;
+    }
 }
 
 
 void Client::fire(unsigned int x, unsigned int y) {
+    string name = "player_" + to_string(player) + ".shot.json";
+    ofstream file;
+    file.open(name);
+    if (file) {
+        {
+            cereal::JSONOutputArchive arc(file);
+            arc(CEREAL_NVP(x));
+            arc(CEREAL_NVP(y));
+        }
+        file.close();
+    }
+
 }
 
 
 bool Client::result_available() {
+    if(HIT | MISS) {
+
+
+        return true;
+
+    }
+
 }
 
 
 int Client::get_result() {
+    string name = "player_" + to_string(player) + ".result.json";
+    int result;
+
+    ifstream file;
+    file.open(name);
+    if(file){
+        {
+            cereal:: JSONInputArchive arc(file);
+            arc(result);
+        }
+        file.close();
+    }
+
+
+
+    if (result>board_size){
+        result = OUT_OF_BOUNDS ;
+    }
+
+
+    return result;
+
+
 }
 
 
 
 void Client::update_action_board(int result, unsigned int x, unsigned int y) {
+
+
+    string name = "player_" + to_string(player) + ".action_board.json";
+    int n[x][y];
+
+    ifstream file;
+    file.open(name);
+    if (file){
+        {
+            cereal::JSONInputArchive arc(file);
+            arc(n[x][y]);
+
+
+        }
+    file.close();
+
+
+    }
+
+    ofstream f;
+    f.open(name);
+    if(f){
+        {
+            cereal::JSONOutputArchive arc(f);
+            arc(CEREAL_NVP(n[x][y]));
+
+
+        }
+    f.close();
+
+    }
+
+
+
+
+
+
 }
-
-
 string Client::render_action_board(){
+
 }
